@@ -2,28 +2,29 @@
 
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
 
 const banners = [
 	{
 		id: 1,
 		title: "Summer Special: 15% Off",
 		description: "Enjoy your summer road trips with our special discount on all SUVs",
-		image: "/placeholder.svg?height=400&width=1200",
+		image: "https://dichvuthuexe.com.vn/wp-content/uploads/2022/11/banner-xe-home.jpg",
 		color: "bg-orange-500",
 	},
 	{
 		id: 2,
 		title: "New Electric Vehicles",
 		description: "Try our new Tesla Model Y and other electric vehicles",
-		image: "/placeholder.svg?height=400&width=1200",
+		image: "https://img.pikbest.com/templates/20240715/luxury-car-rental-promotional-web-banner-design_10669966.jpg!w700wp",
 		color: "bg-green-500",
 	},
 	{
 		id: 3,
 		title: "Weekend Getaway Package",
 		description: "Special weekend rates with unlimited mileage",
-		image: "/placeholder.svg?height=400&width=1200",
+		image: "https://duyngantravel.com/wp-content/uploads/2022/07/banner-duy-ngan-travel2-1524x530.jpg",
 		color: "bg-blue-500",
 	},
 ];
@@ -31,13 +32,13 @@ const banners = [
 export function CarouselBanner() {
 	const [current, setCurrent] = useState(0);
 
-	const next = () => setCurrent((current + 1) % banners.length);
+	const next = useCallback(() => setCurrent((current + 1) % banners.length), [current]);
 	const prev = () => setCurrent((current - 1 + banners.length) % banners.length);
 
 	useEffect(() => {
 		const interval = setInterval(next, 5000);
 		return () => clearInterval(interval);
-	}, [current]);
+	}, [current, next]);
 
 	return (
 		<div className="relative overflow-hidden rounded-xl w-full">
@@ -45,7 +46,7 @@ export function CarouselBanner() {
 				{banners.map((banner) => (
 					<div key={banner.id} className="relative min-w-full">
 						<div className="relative aspect-[3/1] w-full overflow-hidden rounded-xl">
-							<img src={banner.image || "/placeholder.svg"} alt={banner.title} className="h-full w-full object-cover" />
+							<Image src={banner.image || "/placeholder.svg"} alt={banner.title} className="h-full w-full object-cover" width={1024} height={512} />
 							<div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent">
 								<div className="flex h-full flex-col justify-center p-6 text-white md:max-w-md">
 									<h2 className="mb-2 text-2xl font-bold md:text-3xl">{banner.title}</h2>
