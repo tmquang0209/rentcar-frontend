@@ -1,8 +1,10 @@
 "use client";
 
+import { getCategoriesApi } from "@/api";
 import { Car, Convertible, Jeep, Luxury, Minivan, Sedan, Suv, Truck } from "@/components/car-icons";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useQuery } from "@tanstack/react-query";
 
 interface CategoryFilterProps {
 	activeCategory: string;
@@ -10,21 +12,46 @@ interface CategoryFilterProps {
 }
 
 export function CategoryFilter({ activeCategory, setActiveCategory }: CategoryFilterProps) {
-	const categories = [
-		{ id: "all", name: "All Cars", icon: Car },
-		{ id: "suv", name: "SUVs", icon: Suv },
-		{ id: "sedan", name: "Sedans", icon: Sedan },
-		{ id: "luxury", name: "Luxury", icon: Luxury },
-		{ id: "convertible", name: "Convertibles", icon: Convertible },
-		{ id: "truck", name: "Trucks", icon: Truck },
-		{ id: "minivan", name: "Minivans", icon: Minivan },
-		{ id: "jeep", name: "Jeeps", icon: Jeep },
-	];
+	const { data: categoriesData } = useQuery({
+		queryKey: ["categories"],
+		queryFn: async () => {
+			const response = await getCategoriesApi();
+			return response.data;
+		},
+		select: (data) => {
+			return data.data.map((category) => ({
+				id: category.id,
+				name: category.name,
+				icon: getIconByCategory(category.name.toLowerCase()),
+			}));
+		},
+	});
+
+	function getIconByCategory(category: string) {
+		const iconMap = {
+			all: Car,
+			suv: Suv,
+			sedan: Sedan,
+			luxury: Luxury,
+			convertible: Convertible,
+			truck: Truck,
+			minivan: Minivan,
+			jeep: Jeep,
+		};
+		return iconMap[category as keyof typeof iconMap] || Car;
+	}
+
+	// push "All" to first index
+	categoriesData?.unshift({
+		id: "all",
+		name: "All",
+		icon: Car,
+	});
 
 	return (
 		<ScrollArea className="w-full whitespace-nowrap">
 			<div className="flex w-max gap-2 p-1">
-				{categories.map((category) => {
+				{categoriesData?.map((category) => {
 					const Icon = category.icon;
 					return (
 						<Button
