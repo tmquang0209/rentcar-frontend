@@ -1,39 +1,15 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Fuel, Gauge, MapPin, Search, Star, Users } from "lucide-react";
+import { Fuel, Gauge, Inbox, Star, Users } from "lucide-react";
 import Image from "next/image";
-import { useForm } from "react-hook-form";
-import { DatePickerWithRange } from "./ui/date-picker-with-range";
 
 interface CarGridProps {
 	category?: string;
 	filterBy?: "available" | "popular" | "luxury";
 }
 
-interface BookingFormValues {
-	rentalDate: {
-		from: Date;
-		to: Date;
-	};
-	location: string;
-}
-
 export function CarGrid({ category = "all", filterBy }: CarGridProps) {
-	const form = useForm<BookingFormValues>({
-		defaultValues: {
-			rentalDate: {
-				from: new Date(),
-				to: new Date(),
-			},
-			location: "",
-		},
-	});
-
-	const locations = ["Hà Nội", "Hồ Chí Minh"];
-
 	// This would normally come from an API
 	const cars = [
 		{
@@ -47,7 +23,7 @@ export function CarGrid({ category = "all", filterBy }: CarGridProps) {
 			transmission: "Automatic",
 			fuelType: "Gasoline",
 			mileage: "Unlimited",
-			available: true,
+			available: true, 
 			popular: true,
 			luxury: false,
 		},
@@ -137,63 +113,8 @@ export function CarGrid({ category = "all", filterBy }: CarGridProps) {
 		return true;
 	});
 
-	const onSubmit = (data: BookingFormValues) => {
-		console.log(data);
-	};
-
 	return (
 		<div className="space-y-6">
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)}>
-					<div className="rounded-lg border p-4">
-						<div className="grid gap-4 sm:grid-cols-2 w-full">
-							<FormField
-								control={form.control}
-								name="location"
-								render={({ field }) => (
-									<FormItem className="w-full">
-										<FormLabel>Địa điểm</FormLabel>
-										<Select onValueChange={field.onChange} defaultValue={field.value}>
-											<FormControl>
-												<SelectTrigger className="w-full">
-													<SelectValue placeholder="Chọn địa điểm" />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{locations.map((location) => (
-													<SelectItem key={location} value={location}>
-														<div className="flex items-center">
-															<MapPin className="mr-2 h-4 w-4" />
-															{location}
-														</div>
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
-								name="rentalDate"
-								render={({ field }) => (
-									<FormItem className="w-full">
-										<FormLabel>Ngày thuê xe</FormLabel>
-										<div className="flex w-full gap-2">
-											<DatePickerWithRange {...field} className="w-full" />
-											<Button type="submit" size="icon" className="">
-												<Search className="h-4 w-4" />
-											</Button>
-										</div>
-									</FormItem>
-								)}
-							/>
-						</div>
-					</div>
-				</form>
-			</Form>
-
 			<div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
 				{filteredCars.map((car) => (
 					<Card key={car.id} className="overflow-hidden pt-0">
@@ -248,6 +169,12 @@ export function CarGrid({ category = "all", filterBy }: CarGridProps) {
 						</CardFooter>
 					</Card>
 				))}
+				{!filteredCars.length && (
+					<div className="col-span-full text-center py-10">
+						<Inbox className="h-12 w-12 mx-auto text-gray-300" />
+						Không tìm thấy kết quả
+					</div>
+				)}
 			</div>
 		</div>
 	);

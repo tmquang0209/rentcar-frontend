@@ -4,14 +4,48 @@ import { CarGrid } from "@/components/car-grid";
 import { CarouselBanner } from "@/components/carousel-banner";
 import { CategoryFilter } from "@/components/category-filter";
 import { Button } from "@/components/ui/button";
+import { DatePickerWithRange } from "@/components/ui/date-picker-with-range";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Filter, Search } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { MapPin, Search } from "lucide-react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+const vehicleSearchSchema = z.object({
+	searchQuery: z.string(),
+	location: z.string(),
+	rentalDate: z.object({
+		from: z.date(),
+		to: z.date(),
+	}),
+});
+
+type VehicleSearchFormValues = z.infer<typeof vehicleSearchSchema>;
 
 export default function Home() {
-	const [searchQuery, setSearchQuery] = useState("");
 	const [activeCategory, setActiveCategory] = useState("all");
+
+	const form = useForm<VehicleSearchFormValues>({
+		resolver: zodResolver(vehicleSearchSchema),
+		defaultValues: {
+			searchQuery: "",
+			location: "",
+			rentalDate: {
+				from: new Date(),
+				to: new Date(),
+			},
+		},
+	});
+
+	const locations = ["Hà Nội", "Hồ Chí Minh"];
+
+	const onSubmit = (data: VehicleSearchFormValues) => {
+		console.log(data);
+	};
 
 	return (
 		<div className="container mx-auto flex flex-col gap-6 p-4 md:p-6">
@@ -25,16 +59,73 @@ export default function Home() {
 			</div>
 
 			<div className="flex flex-col gap-4">
-				<div className="flex flex-col gap-4 sm:flex-row">
-					<div className="relative flex-1">
-						<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-						<Input placeholder="Tìm kiếm xe theo hãng, mẫu hoặc tính năng..." className="pl-9" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-					</div>
-					<Button variant="outline" className="gap-2">
-						<Filter className="h-4 w-4" />
-						Bộ Lọc
-					</Button>
-				</div>
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)}>
+						<div className="rounded-lg border p-4">
+							<div className="grid gap-4 w-full">
+								<div className="flex flex-col gap-4 sm:flex-row">
+									<FormField
+										control={form.control}
+										name="searchQuery"
+										render={({ field }) => (
+											<FormItem className="relative flex-1">
+												<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+												<FormControl>
+													<Input {...field} placeholder="Tìm kiếm xe theo hãng, mẫu hoặc tính năng..." className="pl-9" />
+												</FormControl>
+											</FormItem>
+										)}
+									/>
+								</div>
+
+								<div className="grid gap-4 sm:grid-cols-2">
+									<FormField
+										control={form.control}
+										name="location"
+										render={({ field }) => (
+											<FormItem className="w-full">
+												<FormLabel>Địa điểm</FormLabel>
+												<Select onValueChange={field.onChange} defaultValue={field.value}>
+													<FormControl>
+														<SelectTrigger className="w-full">
+															<SelectValue placeholder="Chọn địa điểm" />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{locations.map((location) => (
+															<SelectItem key={location} value={location}>
+																<div className="flex items-center">
+																	<MapPin className="mr-2 h-4 w-4" />
+																	{location}
+																</div>
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+											</FormItem>
+										)}
+									/>
+
+									<FormField
+										control={form.control}
+										name="rentalDate"
+										render={({ field }) => (
+											<FormItem className="w-full">
+												<FormLabel>Ngày thuê xe</FormLabel>
+												<div className="flex w-full gap-2">
+													<DatePickerWithRange {...field} className="w-full" />
+													<Button type="submit" size="icon">
+														<Search className="h-4 w-4" />
+													</Button>
+												</div>
+											</FormItem>
+										)}
+									/>
+								</div>
+							</div>
+						</div>
+					</form>
+				</Form>
 
 				<CategoryFilter activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
 
