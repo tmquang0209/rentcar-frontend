@@ -7,7 +7,10 @@ import Image from "next/image";
 import { useState } from "react";
 
 interface ImageSliderProps {
-	images: string[];
+	images: {
+		id: string;
+		imageUrl: string;
+	}[];
 }
 
 export function ImageSlider({ images }: ImageSliderProps) {
@@ -57,7 +60,8 @@ export function ImageSlider({ images }: ImageSliderProps) {
 				{images.map((image, index) => (
 					<div key={index} className={`absolute h-full w-full transition-opacity duration-500 ${index === currentIndex ? "opacity-100" : "opacity-0"}`}>
 						<Image
-							src={image || "/placeholder.svg?height=500&width=800"}
+							key={image.id}
+							src={image.imageUrl || "/placeholder.svg?height=500&width=800"}
 							alt={`Vehicle image ${index + 1}`}
 							fill
 							className="object-cover"
@@ -75,7 +79,7 @@ export function ImageSlider({ images }: ImageSliderProps) {
 						className={`relative h-20 w-32 shrink-0 cursor-pointer overflow-hidden rounded-md border-2 ${index === currentIndex ? "border-primary" : "border-transparent"}`}
 						onClick={() => goToSlide(index)}
 					>
-						<Image src={image || "/placeholder.svg?height=80&width=128"} alt={`Thumbnail ${index + 1}`} fill className="object-cover" sizes="128px" />
+						<Image key={image.id} src={image.imageUrl || "/placeholder.svg?height=80&width=128"} alt={`Thumbnail ${index + 1}`} fill className="object-cover" sizes="128px" />
 					</div>
 				))}
 			</div>
@@ -110,7 +114,7 @@ export function ImageSlider({ images }: ImageSliderProps) {
 						</Button>
 
 						<div className="h-full w-full">
-							<Image src={images[fullscreenIndex] || "/placeholder.svg?height=1080&width=1920"} alt={`Vehicle image ${fullscreenIndex + 1}`} fill className="object-contain" sizes="100vw" />
+							<Image src={images[fullscreenIndex].imageUrl || "/placeholder.svg?height=1080&width=1920"} alt={`Vehicle image ${fullscreenIndex + 1}`} fill className="object-contain" sizes="100vw" />
 						</div>
 					</div>
 				</DialogContent>

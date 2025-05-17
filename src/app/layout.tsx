@@ -2,6 +2,7 @@ import { Footer } from "@/components/footer";
 import { TopNavbar } from "@/components/top-navbar";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import React from "react";
 import "./globals.css";
 import Providers from "./providers";
 
@@ -26,14 +27,14 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<>
-			<Providers>
-				<TopNavbar />
-				<html lang="en">
-					<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+		<html lang="en">
+			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+				<Providers>
+					<TopNavbar />
+					{children}
 					<Footer />
-				</html>
-			</Providers>
-		</>
+				</Providers>
+			</body>
+		</html>
 	);
 }
