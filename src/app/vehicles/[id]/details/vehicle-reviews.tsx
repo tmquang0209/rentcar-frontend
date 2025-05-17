@@ -4,25 +4,24 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { getReviewsByVehicleId } from "@/lib/reviews";
+import { IReviewInfo } from "@/lib/interfaces";
 import { useState } from "react";
 
 interface VehicleReviewsProps {
 	vehicleId: string;
+	reviews: IReviewInfo[];
 }
 
-export function VehicleReviews({ vehicleId }: VehicleReviewsProps) {
+export function VehicleReviews({ reviews }: VehicleReviewsProps) {
 	const [sortBy, setSortBy] = useState("newest");
 	const [showReviewForm, setShowReviewForm] = useState(false);
 	const [reviewText, setReviewText] = useState("");
 	const [rating, setRating] = useState(5);
 	const [hoverRating, setHoverRating] = useState(0);
 
-	const reviews = getReviewsByVehicleId(vehicleId);
-
-	const sortedReviews = [...reviews].sort((a, b) => {
+	const sortedReviews = [...(reviews || [])].sort((a, b) => {
 		if (sortBy === "newest") {
-			return new Date(b.date).getTime() - new Date(a.date).getTime();
+			return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 		} else if (sortBy === "highest") {
 			return b.rating - a.rating;
 		} else if (sortBy === "lowest") {
@@ -90,12 +89,12 @@ export function VehicleReviews({ vehicleId }: VehicleReviewsProps) {
 						<div className="mb-2 flex items-center justify-between">
 							<div className="flex items-center gap-2">
 								<Avatar>
-									<AvatarImage src={review.userAvatar || "/placeholder.svg"} />
-									<AvatarFallback>{review.userName.slice(0, 2).toUpperCase()}</AvatarFallback>
+									<AvatarImage src={"/placeholder.svg"} />
+									<AvatarFallback>{review.reviewer.fullName.slice(0, 2).toUpperCase()}</AvatarFallback>
 								</Avatar>
 								<div>
-									<h4 className="font-medium">{review.userName}</h4>
-									<p className="text-sm text-muted-foreground">{review.date}</p>
+									<h4 className="font-medium">{review.reviewer.fullName}</h4>
+									<p className="text-sm text-muted-foreground">{review.createdAt.toString()}</p>
 								</div>
 							</div>
 							<div className="flex items-center">
@@ -109,14 +108,14 @@ export function VehicleReviews({ vehicleId }: VehicleReviewsProps) {
 							</div>
 						</div>
 
-						<p className="text-muted-foreground">{review.text}</p>
+						<p className="text-muted-foreground">{review.comment}</p>
 
-						{review.reply && (
+						{/* {review.reply && (
 							<div className="mt-4 rounded-lg bg-muted p-3">
 								<p className="text-sm font-medium">Phản hồi từ DriveEasy:</p>
 								<p className="text-sm text-muted-foreground">{review.reply}</p>
 							</div>
-						)}
+						)} */}
 					</div>
 				))}
 

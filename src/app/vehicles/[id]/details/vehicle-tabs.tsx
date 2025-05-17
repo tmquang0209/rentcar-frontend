@@ -2,33 +2,16 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { IVehicleInfo } from "@/lib/interfaces";
+import { getVehicleById } from "@/lib/vehicles";
 
 interface VehicleTabsProps {
-	vehicle: {
-		id: string;
-		name: string;
-		category: string;
-		available: boolean;
-		luxury: boolean;
-		seats: number;
-		fuelType: string;
-		transmission: string;
-		year: number;
-		features: string[];
-		inclusions: string[];
-		description: string;
-		whyChoose: string;
-		specifications: {
-			[key: string]: string;
-		};
-		rentalPolicy: {
-			[key: string]: string;
-		};
-		price: number;
-	};
+	vehicle: IVehicleInfo;
 }
 
 export function VehicleTabs({ vehicle }: VehicleTabsProps) {
+	const dump = getVehicleById(vehicle.id);
+
 	return (
 		<Tabs defaultValue="description" className="mb-6">
 			<TabsList className="grid w-full grid-cols-3">
@@ -42,9 +25,8 @@ export function VehicleTabs({ vehicle }: VehicleTabsProps) {
 					<CardContent className="p-6">
 						<h3 className="mb-2 text-xl font-semibold">Thông tin về xe</h3>
 						<p className="mb-4 text-muted-foreground">{vehicle.description}</p>
-
 						<h4 className="mb-2 text-lg font-semibold">Tại sao chọn {vehicle.name}?</h4>
-						<p className="text-muted-foreground">{vehicle.whyChoose}</p>
+						<p className="text-muted-foreground">{dump.whyChoose}</p>
 					</CardContent>
 				</Card>
 			</TabsContent>
@@ -55,7 +37,7 @@ export function VehicleTabs({ vehicle }: VehicleTabsProps) {
 						<h3 className="mb-4 text-xl font-semibold">Thông số kỹ thuật</h3>
 
 						<div className="grid gap-4 sm:grid-cols-2">
-							{Object.entries(vehicle.specifications).map(([key, value]: [string, unknown]) => (
+							{Object.entries(dump.specifications).map(([key, value]: [string, unknown]) => (
 								<div key={key} className="flex justify-between border-b pb-2">
 									<span className="font-medium capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
 									<span className="text-muted-foreground">{value as string}</span>

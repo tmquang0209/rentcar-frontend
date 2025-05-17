@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 
+import { getVehicleByIdApi } from "@/api";
+import { getListReviewApi } from "@/api/review.api";
 import { ImageSlider } from "@/components/image-slider";
 import { DatePickerWithRange } from "@/components/ui/date-picker-with-range";
-import { getVehicleById } from "@/lib/vehicles";
+import { useQuery } from "@tanstack/react-query";
+import { addDays } from "date-fns";
 import { BookingSummary } from "./booking-summary";
 import { VehicleInfo } from "./vehicle-info";
 import { VehicleReviews } from "./vehicle-reviews";
@@ -15,11 +18,26 @@ interface VehicleDetailsProps {
 }
 
 export function VehicleDetails({ id }: VehicleDetailsProps) {
-	const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-	const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+	const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+	const [endDate, setEndDate] = useState<Date | undefined>(addDays(new Date(), 7));
 
 	// Fetch vehicle data (in a real app, this would be an API call)
-	const vehicle = getVehicleById(id);
+	const { data: vehicle } = useQuery({
+		queryKey: ["vehicle", id],
+		queryFn: async () => {
+			const res = await getVehicleByIdApi(id);
+			return res.data;
+		},
+	});
+
+	const { data: reviews } = useQuery({
+		queryKey: ["reviews-by-vehicle", id],
+		queryFn: async () => {
+			const res = await getListReviewApi({ vehicleId: id });
+			return res.data;
+		},
+	});
+
 	const handleDateChange = (start?: Date, end?: Date) => {
 		setStartDate(start);
 		setEndDate(end);
@@ -53,17 +71,17 @@ export function VehicleDetails({ id }: VehicleDetailsProps) {
 									<span key={i}>★</span>
 								))}
 						</div>
-						<span className="text-lg font-medium">{vehicle.rating}</span>
-						<span className="text-muted-foreground">({vehicle.reviewCount} đánh giá)</span>
+						<span className="text-lg font-medium">{Number(vehicle.averageRating).toFixed(1)}</span>
+						<span className="text-muted-foreground">({reviews?.data.length} đánh giá)</span>
 					</div>
 				</div>
 
 				<div className="grid gap-6 lg:grid-cols-3">
 					<div className="lg:col-span-2">
-						<ImageSlider images={vehicle.images} />
+						<ImageSlider images={vehicle.images || []} />
 						<VehicleInfo vehicle={vehicle} />
 						<VehicleTabs vehicle={vehicle} />
-						<VehicleReviews vehicleId={id} />
+						<VehicleReviews vehicleId={id} reviews={reviews?.data || []} />
 					</div>
 					<div className="lg:col-span-1">
 						<div className="sticky top-20">
