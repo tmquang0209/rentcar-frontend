@@ -1,16 +1,13 @@
 "use client";
 import { useParams } from "next/navigation";
+import { VehicleDetails } from "./vehicle-details";
 
-export default function VehicleDetails() {
+export default function VehicleDetailsPage() {
 	const { id } = useParams<{
 		id: string;
 	}>();
 
 	// TODO: Fetch vehicle details from API
 
-	return (
-		<div>
-			<h1>Vehicle Details {id}</h1>
-		</div>
-	);
+	return <VehicleDetails id={id} />;
 }
