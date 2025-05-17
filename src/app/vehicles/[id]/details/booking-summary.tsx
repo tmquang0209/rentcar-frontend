@@ -4,9 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { EVehicleStatus } from "@/lib/enums";
+import { cleaningFeeData, insurancePriceList } from "@/lib/fee";
 import { IVehicleInfo } from "@/lib/interfaces";
 import { currencyFormat } from "@/lib/shared/currency-format";
 import { differenceInDays } from "date-fns";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface BookingSummaryProps {
 	vehicle: IVehicleInfo;
@@ -15,17 +18,17 @@ interface BookingSummaryProps {
 }
 
 export function BookingSummary({ vehicle, startDate, endDate }: BookingSummaryProps) {
-	// const router = useRouter();
+	const router = useRouter();
 
 	const daysCount = startDate && endDate ? differenceInDays(endDate, startDate) + 1 : 0;
 	const basePrice = vehicle.pricePerDay * daysCount;
-	const insurancePrice = 150000 * daysCount;
-	const cleaningFee = 250000;
+	const insurancePrice = insurancePriceList.basic * daysCount;
+	const cleaningFee = cleaningFeeData;
 	const totalPrice = basePrice + insurancePrice + cleaningFee;
 
 	const handleBookNow = () => {
 		if (!startDate || !endDate) {
-			alert("Vui lòng chọn ngày nhận và trả xe trước khi đặt.");
+			toast.error("Vui lòng chọn ngày nhận và trả xe trước khi đặt.");
 			return;
 		}
 		console.log("Đang đặt xe", {
@@ -34,7 +37,7 @@ export function BookingSummary({ vehicle, startDate, endDate }: BookingSummaryPr
 			endDate,
 			totalPrice,
 		});
-		alert("Chức năng đặt xe sẽ được triển khai tại đây.");
+		router.push(`/booking/${vehicle.id}?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`);
 	};
 
 	return (
@@ -52,7 +55,7 @@ export function BookingSummary({ vehicle, startDate, endDate }: BookingSummaryPr
 					</div>
 
 					<div className="flex justify-between">
-						<span className="text-muted-foreground">Bảo hiểm (150.000/ngày)</span>
+						<span className="text-muted-foreground">Bảo hiểm ({currencyFormat(insurancePriceList.basic)}/ngày)</span>
 						<span>{currencyFormat(insurancePrice || 0)}</span>
 					</div>
 
