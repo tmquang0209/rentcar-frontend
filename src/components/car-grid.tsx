@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Fuel, Gauge, Inbox, Star, Users } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface CarGridProps {
 	category?: string;
@@ -10,6 +11,7 @@ interface CarGridProps {
 }
 
 export function CarGrid({ category = "all", filterBy }: CarGridProps) {
+	const router = useRouter();
 	// This would normally come from an API
 	const cars = [
 		{
@@ -23,7 +25,7 @@ export function CarGrid({ category = "all", filterBy }: CarGridProps) {
 			transmission: "Automatic",
 			fuelType: "Gasoline",
 			mileage: "Unlimited",
-			available: true, 
+			available: true,
 			popular: true,
 			luxury: false,
 		},
@@ -113,6 +115,14 @@ export function CarGrid({ category = "all", filterBy }: CarGridProps) {
 		return true;
 	});
 
+	/**
+	 * TODO: Implement display cars list
+	 * 1. Get all cars by category
+	 * 2. Filter cars based on other filters
+	 * 3. Display cars list
+	 * It re-call this function when category or other filters change
+	 */
+
 	return (
 		<div className="space-y-6">
 			<div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
@@ -165,7 +175,10 @@ export function CarGrid({ category = "all", filterBy }: CarGridProps) {
 								<span className="text-xl font-bold">${car.price}</span>
 								<span className="text-muted-foreground">/ngày</span>
 							</div>
-							<Button disabled={!car.available}>{car.available ? "Đặt ngay" : "Không khả dụng"}</Button>
+
+							<Button className="hover:cursor-pointer" onClick={() => router.push(`/vehicles/${car.id}/details`)}>
+								Xem chi tiết
+							</Button>
 						</CardFooter>
 					</Card>
 				))}
