@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { IReviewInfo } from "@/lib/interfaces";
+import { format } from "date-fns";
 import { useState } from "react";
 
 interface VehicleReviewsProps {
@@ -94,7 +95,7 @@ export function VehicleReviews({ reviews }: VehicleReviewsProps) {
 								</Avatar>
 								<div>
 									<h4 className="font-medium">{review.reviewer.fullName}</h4>
-									<p className="text-sm text-muted-foreground">{review.createdAt.toString()}</p>
+									<p className="text-sm text-muted-foreground">{format(new Date(review.createdAt), "dd/MM/yyyy")}</p>
 								</div>
 							</div>
 							<div className="flex items-center">
